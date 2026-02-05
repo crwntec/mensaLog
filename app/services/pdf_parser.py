@@ -16,7 +16,7 @@ from typing import Dict, List
 from datetime import datetime
 import pdfplumber
 
-from models import DayMeals, Mealplan
+from models import DayDict, Mealplan
 
 
 def extract_meals(pdf_path: str) -> Mealplan:
@@ -64,14 +64,14 @@ def extract_meals(pdf_path: str) -> Mealplan:
     return None
 
 
-def parse_table(table: List[List[str]]) -> Dict[str, DayMeals]:
+def parse_table(table: List[List[str]]) -> Dict[str, DayDict]:
     """
     Parse a table structure to extract meal information.
     
     Args:
         table (List[List[str]]): Table data as extracted by pdfplumber.
     Returns:
-        Dict[str, DayMeals]: ISO-date → day data
+        Dict[str, DayDict]: ISO-date → day data
     """
     if not table or len(table) < 2:
         return {}
