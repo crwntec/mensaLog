@@ -37,7 +37,7 @@ app = FastAPI(
 )
 
 # Start scheduler
-scheduler = BackgroundScheduler(timezone="UTC+1")
+scheduler = BackgroundScheduler(timezone="Europe/Berlin")
 scheduler.add_job(download_and_parse_pdf, "cron", hour=7, minute=0)
 scheduler.start()
 init_db()
