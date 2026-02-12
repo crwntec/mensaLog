@@ -62,12 +62,12 @@ async def lifespan(app: FastAPI):
         scheduler.start()
         logger.info("APScheduler started with %d job(s)", len(scheduler.get_jobs()))
 
-        logger.info("Triggering initial meal plan download")
-        ok = download_and_parse_pdf()
-        if not ok:
-            logger.warning("Initial meal plan download reported failure")
-        else:
-            logger.info("Initial meal plan download completed successfully")
+        # logger.info("Triggering initial meal plan download")
+        # ok = download_and_parse_pdf()
+        # if not ok:
+        #     logger.warning("Initial meal plan download reported failure")
+        # else:
+        #     logger.info("Initial meal plan download completed successfully")
 
         # --- DB stats check after startup ---
         stats = db_stats()
@@ -110,7 +110,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="mensa API",
     description="API to retrieve meal plans (Speisenplan)",
-    version="1.0.1",
+    version="1.0.2",
     lifespan=lifespan,
 )
     

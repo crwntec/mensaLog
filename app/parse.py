@@ -45,7 +45,9 @@ def parse_xls(file_path):
     """Parse old Excel format (.xls)"""
     workbook = xlrd.open_workbook(file_path)
     sheet = workbook.sheet_by_index(0)
-    year = file_path.split("/")[-2]  # Extract year from path
+    year_dir = os.path.dirname(file_path)
+    year = os.path.basename(year_dir) 
+    year = int(year)
     
     # Try to extract week from the sheet first
     week = None
@@ -131,7 +133,9 @@ def parse_xlsx(file_path):
     """Parse new Excel format (.xlsx)"""
     workbook = openpyxl.load_workbook(file_path, data_only=True)
     sheet = workbook.active
-    year = file_path.split("/")[-2]  # Extract year from path
+    year_dir = os.path.dirname(file_path)
+    year = os.path.basename(year_dir) 
+    year = int(year)
 
     # Try to get week number from cell
     week = None

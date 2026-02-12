@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import re
+import pdfplumber
 import requests
 from models import Mealplan
 from database import create_mealplan, fetch_mealplan
@@ -61,48 +62,48 @@ def download_and_parse_pdf():
         if not pdf_url:
             return False
 
-        # 3. Download and Save with custom naming: KW{week1}_KW{week2}.pdf
-        # We use zfill(2) to ensure week 6 becomes "06"
-        filename = f"KW{str(first_week).zfill(2)}_KW{str(second_week).zfill(2)}.pdf"
+       # 3. Download the full PDF temporarily
+        temp_filename = f"temp_KW{str(first_week).zfill(2)}_KW{str(second_week).zfill(2)}.pdf"
         save_dir = f"./archive/{year}"
         os.makedirs(save_dir, exist_ok=True)
-        pdf_path = os.path.join(save_dir, filename)
-
-        print(f"[{datetime.now()}] Downloading to {pdf_path}...")
+        
+        print(f"[{datetime.now()}] Downloading to temp {temp_filename}...")
         response = requests.get(pdf_url, timeout=10)
         response.raise_for_status()
         
-        with open(pdf_path, "wb") as f:
+        with open(temp_filename, "wb") as f:
             f.write(response.content)
 
-        # 4. Parse the PDF
-        # Note: extract_meals returns a Mealplan object containing ALL days found
-        parsed_data = extract_meals(pdf_path)
-        if not parsed_data:
-            return False
-
-        # 5. Split the data by week
-        week1_days = {}
-        week2_days = {}
-
-        for date_iso, day_data in parsed_data.days.items():
-            date_obj = datetime.fromisoformat(date_iso)
-            day_week = date_obj.isocalendar()[1]
+        with pdfplumber.open(temp_filename) as pdf:
+            if len(pdf.pages) < 2:
+                print("PDF doesn't have 2 pages!")
+                os.remove(temp_filename)
+                return False
             
-            if day_week == first_week:
-                week1_days[date_iso] = day_data
-            elif day_week == second_week:
-                week2_days[date_iso] = day_data
+            # Process week 1 (page 0)
+            week1_filename = f"KW{str(first_week).zfill(2)}.pdf"
+            week1_path = os.path.join(save_dir, week1_filename)
+            with open(week1_path, "wb") as f:
+                f.write(pdf.pages[0].to_image().original)  # Save page 0 as PDF
+            
+            week1_data = extract_meals(pdf.pages[0])  # Pass Page object directly
+            if week1_data:
+                create_mealplan(Mealplan(year=year, week=first_week, days=week1_data.days))
+                print(f"Stored Week {first_week} from {week1_filename}")
 
-        # 6. Save separate objects to Database
-        if week1_days:
-            create_mealplan(Mealplan(year=year, week=first_week, days=week1_days))
-            print(f"Stored Week {first_week}")
-        
-        if week2_days:
-            create_mealplan(Mealplan(year=year, week=second_week, days=week2_days))
-            print(f"Stored Week {second_week}")
+            # Process week 2 (page 1)  
+            week2_filename = f"KW{str(second_week).zfill(2)}.pdf"
+            week2_path = os.path.join(save_dir, week2_filename)
+            with open(week2_path, "wb") as f:
+                f.write(pdf.pages[1].to_image().original)  # Save page 1 as PDF
+            
+            week2_data = extract_meals(pdf.pages[1])
+            if week2_data:
+                create_mealplan(Mealplan(year=year, week=second_week, days=week2_data.days))
+                print(f"Stored Week {second_week} from {week2_filename}")
 
+        # 5. Clean up temp file
+        os.remove(temp_filename)
         return True
 
     except Exception as e:

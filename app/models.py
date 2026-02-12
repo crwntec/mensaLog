@@ -29,7 +29,7 @@ class MealDict(TypedDict):
 class DayDict(TypedDict):
     """Day information with weekday and meals"""
     weekday: str
-    meals: Dict[str, MealDict]  # category -> meal object with id and name
+    meals: Dict[str, Optional[MealDict]]  # category -> meal object with id and name
 
 @dataclass
 class Mealplan:
