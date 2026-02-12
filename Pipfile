@@ -9,6 +9,8 @@ requests = "*"
 apscheduler = "*"
 fastapi = {extras = ["standard"], version = "*"}
 bs4 = "*"
+openpyxl = "*"
+xlrd = "*"
 
 [dev-packages]
 

@@ -4,47 +4,116 @@ Features:
 - API endpoint to get current meal plan
 - APScheduler job to download & parse PDF periodically
 """
+import logging
 from datetime import datetime
 import time
 from typing import Generic, Optional, TypeVar
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from parse import import_historical_data
 from models import *
 from database import *
 from scheduler import download_and_parse_pdf
 
+# -----------------------------------------------------------------------------
+# Logging setup
+# -----------------------------------------------------------------------------
+logger = logging.getLogger("mensa-api")
+logger.setLevel(logging.INFO)
+
+# If no handlers are configured (e.g., when not run under uvicorn), add one
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
 startup_time = time.time()
-# =========================
-# RESPONSE MODELS
-# =========================
+scheduler: BackgroundScheduler | None = None
+
 T = TypeVar('T')
 
+
 class ApiResponse(BaseModel, Generic[T]):
-    """Generic API response wrapper"""
     success: bool
     data: Optional[T] = None
     error: Optional[str] = None
 
-# =========================
-# CONFIGURATION
-# =========================
-# FastAPI app
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global scheduler
+
+    logger.info("Application startup initiated")
+
+    try:
+        logger.info("Initializing database schema")
+        init_db()
+
+        logger.info("Configuring APScheduler (Europe/Berlin, daily at 07:00)")
+        scheduler = BackgroundScheduler(timezone="Europe/Berlin")
+        scheduler.add_job(download_and_parse_pdf, "cron", hour=7, minute=0)
+        scheduler.start()
+        logger.info("APScheduler started with %d job(s)", len(scheduler.get_jobs()))
+
+        logger.info("Triggering initial meal plan download")
+        ok = download_and_parse_pdf()
+        if not ok:
+            logger.warning("Initial meal plan download reported failure")
+        else:
+            logger.info("Initial meal plan download completed successfully")
+
+        # --- DB stats check after startup ---
+        stats = db_stats()
+        logger.info(
+            "Database stats after startup | healthy=%s, mealplans=%s, days=%s, meals=%s, "
+            "oldest=%s, latest=%s, size_mb=%s",
+            stats.get("healthy"),
+            stats.get("total_mealplans"),
+            stats.get("total_days"),
+            stats.get("total_meals"),
+            stats.get("oldest_mealplan"),
+            stats.get("last_mealplan"),
+            stats.get("database_size_mb"),
+        )
+        if not stats.get("healthy"):
+            logger.warning("Database reported unhealthy status at startup: %s", stats.get("error"))
+
+        if stats.get("total_mealplans", 0) == 0:
+            logger.warning("No meal plans found in database after startup")
+            logger.info("Importing historical meal plan data from archive")
+            import_historical_data()
+            logger.info("Historical data import completed")
+
+    except Exception as exc:
+        logger.exception("Startup sequence failed: %s", exc)
+        # Yield anyway so health endpoints can expose the failure
+        yield
+        return
+
+    logger.info("Application startup completed successfully")
+    yield
+
+    logger.info("Application shutdown initiated")
+    if scheduler and scheduler.running:
+        logger.info("Shutting down APScheduler")
+        scheduler.shutdown()
+    logger.info("Application shutdown completed")
+
+
 app = FastAPI(
-    title="mensa API", 
-    description="API to retrieve meal plans (Speisenplan)", 
-    version="1.0.1"
+    title="mensa API",
+    description="API to retrieve meal plans (Speisenplan)",
+    version="1.0.1",
+    lifespan=lifespan,
 )
-
-# Start scheduler
-scheduler = BackgroundScheduler(timezone="Europe/Berlin")
-scheduler.add_job(download_and_parse_pdf, "cron", hour=7, minute=0)
-scheduler.start()
-init_db()
-
-# Initial fetch on startup
-download_and_parse_pdf()
-
+    
 # =========================
 # ENDPOINTS
 # =========================
@@ -98,44 +167,42 @@ def get_meal(meal_id: int):
         raise HTTPException(status_code=404, detail="Meal not found")
     return {"success": True, "data": data}
 
-@app.get("/health",
-    summary="Health check endpoint",
-    response_model=ApiResponse[HealthCheckResponse],
-    responses={
-        200: {"description": "Service is healthy"},
-        503: {"description": "Service is unhealthy"},
-    }
-)
+@app.get("/health", response_model=ApiResponse[HealthCheckResponse])
 def health_check():
-    """
-    Comprehensive health check including:
-    - API status and version
-    - Database connectivity and statistics
-    - Scheduler status
-    - Uptime information
-    """
     stats = db_stats()
-    
-    # Calculate uptime
     uptime = round(time.time() - startup_time, 2)
-    
-    # Check scheduler status
-    scheduler_running = scheduler.running
-    scheduler_jobs = len(scheduler.get_jobs())
+
+    global scheduler
+    scheduler_running = bool(scheduler and scheduler.running)
+    scheduler_jobs = len(scheduler.get_jobs()) if scheduler else 0
     next_run = None
-    if scheduler_jobs > 0:
+    if scheduler and scheduler_jobs > 0:
         jobs = scheduler.get_jobs()
-        next_run_time = jobs[0].next_run_time
-        if next_run_time:
-            next_run = next_run_time.isoformat()
-    
-    # Determine overall health
+        if jobs and jobs[0].next_run_time:
+            next_run = jobs[0].next_run_time.isoformat()
+
     is_healthy = (
-        stats["healthy"] and 
-        scheduler_running and 
+        stats["healthy"] and
+        scheduler_running and
         scheduler_jobs > 0
     )
-    
+
+    if is_healthy:
+        logger.debug(
+            "Health check OK | uptime=%ss, db_mealplans=%s, scheduler_jobs=%s",
+            uptime, stats["total_mealplans"], scheduler_jobs,
+        )
+    else:
+        logger.warning(
+            "Health check UNHEALTHY | uptime=%ss, db_healthy=%s, "
+            "scheduler_running=%s, scheduler_jobs=%s, db_error=%s",
+            uptime,
+            stats.get("healthy"),
+            scheduler_running,
+            scheduler_jobs,
+            stats.get("error"),
+        )
+
     response = {
         "status": "healthy" if is_healthy else "unhealthy",
         "timestamp": datetime.now().isoformat(),
@@ -149,41 +216,35 @@ def health_check():
             "last_update": stats["last_update"],
             "last_mealplan": stats["last_mealplan"],
             "oldest_mealplan": stats["oldest_mealplan"],
-            "database_size_mb": stats["database_size_mb"]
+            "database_size_mb": stats["database_size_mb"],
         },
         "scheduler": {
             "running": scheduler_running,
             "jobs_count": scheduler_jobs,
-            "next_run": next_run
-        }
+            "next_run": next_run,
+        },
     }
-    
-    # Add error info if unhealthy
     if "error" in stats:
         response["database"]["error"] = stats["error"]
-    
-    # Return 503 if unhealthy
+
     status_code = 200 if is_healthy else 503
-    
     return {"success": is_healthy, "data": response}
 
 
-@app.get("/health/simple",
-    summary="Simple health check (returns 200 OK if healthy)",
-    responses={
-        200: {"description": "Service is healthy"},
-        503: {"description": "Service is unhealthy"},
-    }
-)
+@app.get("/health/simple")
 def simple_health_check():
-    """
-    Lightweight health check for load balancers and monitoring tools.
-    Returns minimal data with appropriate HTTP status code.
-    """
     stats = db_stats()
-    is_healthy = stats["healthy"] and scheduler.running
-    
+    global scheduler
+    scheduler_running = bool(scheduler and scheduler.running)
+    is_healthy = stats["healthy"] and scheduler_running
+
     if is_healthy:
+        logger.debug("Simple health check OK")
         return {"status": "ok"}
     else:
+        logger.warning(
+            "Simple health check UNHEALTHY | db_healthy=%s, scheduler_running=%s",
+            stats.get("healthy"),
+            scheduler_running,
+        )
         raise HTTPException(status_code=503, detail="Service unhealthy")
