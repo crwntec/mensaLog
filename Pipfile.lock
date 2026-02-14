@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "113d6297b9f50d06df7575ca851e9dd3a11334a50fb4bf91f7c5bae077d8ea51"
+            "sha256": "bfd0e838048fb416e4fb1e66728f10080c4e48305ea4e40fd0a2872a1e037b86"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -39,6 +39,15 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==4.12.1"
+        },
+        "apscheduler": {
+            "hashes": [
+                "sha256:2a9966b052ec805f020c8c4c3ae6e6a06e24b1bf19f2e11d91d8cca0473eef41",
+                "sha256:ce005177f741409db4e4dd40a7431b76feb856b9dd69d57e0da49d6715bfd26d"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==3.11.2"
         },
         "beautifulsoup4": {
             "hashes": [
@@ -392,11 +401,11 @@
         },
         "fastapi-cloud-cli": {
             "hashes": [
-                "sha256:76857b0f09d918acfcb50ade34682ba3b2079ca0c43fda10215de301f185a7f8",
-                "sha256:ecc83a5db106be35af528eccb01aa9bced1d29783efd48c8c1c831cf111eea99"
+                "sha256:9c666c2ab1684cee48a5b0a29ac1ae0bd395b9a13bf6858448b4369ea68beda1",
+                "sha256:c897d1d5e27f5b4148ed2601076785155ec8fb385a6a62d3e8801880f929629f"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==0.11.0"
+            "version": "==0.12.0"
         },
         "fastar": {
             "hashes": [
@@ -1393,11 +1402,11 @@
         },
         "typer": {
             "hashes": [
-                "sha256:79f4bc262b6c37872091072a3cb7cb6d7d79ee98c0c658b4364bdcde3c42c913",
-                "sha256:d8378833e47ada5d3d093fa20c4c63427cc4e27127f6b349a6c359463087d8cc"
+                "sha256:2070374e4d31c83e7b61362fd859aa683576432fd5b026b060ad6b4cd3b86134",
+                "sha256:3291ad0d3c701cbf522012faccfbb29352ff16ad262db2139e6b01f15781f14e"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==0.23.0"
+            "version": "==0.23.1"
         },
         "typing-extensions": {
             "hashes": [
@@ -1414,6 +1423,22 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==0.4.2"
+        },
+        "tzdata": {
+            "hashes": [
+                "sha256:06a47e5700f3081aab02b2e513160914ff0694bce9947d6b76ebd6bf57cfc5d1",
+                "sha256:de39c2ca5dc7b0344f2eba86f49d614019d29f060fc4ebc8a417896a620b56a7"
+            ],
+            "markers": "python_version >= '2'",
+            "version": "==2025.3"
+        },
+        "tzlocal": {
+            "hashes": [
+                "sha256:cceffc7edecefea1f595541dbd6e990cb1ea3d19bf01b2809f362a03dd7921fd",
+                "sha256:eb1a66c3ef5847adf7a834f1be0800581b683b5608e74f86ecbcef8ab91bb85d"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==5.3.1"
         },
         "urllib3": {
             "hashes": [
