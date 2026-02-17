@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "de31941b6bddfe2855fd569a1b1092e8f09d1f349c0dfe7cc50e2553b236c354"
+            "sha256": "eaf498beca53239dfe6f37429ab6b254687db4122dc70a322908d7a65fed4003"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1808,12 +1808,12 @@
         },
         "sentence-transformers": {
             "hashes": [
-                "sha256:280ac54bffb84c110726b4d8848ba7b7c60813b9034547f8aea6e9a345cd1c23",
-                "sha256:7033ee0a24bc04c664fd490abf2ef194d387b3a58a97adcc528783ff505159fa"
+                "sha256:3cd3044e1f3fe859b6a1b66336aac502eaae5d3dd7d5c8fc237f37fbf58137c7",
+                "sha256:6437c62d4112b615ddebda362dfc16a4308d604c5b68125ed586e3e95d5b2e30"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
-            "version": "==5.2.2"
+            "version": "==5.2.3"
         },
         "sentry-sdk": {
             "hashes": [
@@ -1902,9 +1902,6 @@
             "version": "==0.22.2"
         },
         "torch": {
-            "extras": [
-                "cpu"
-            ],
             "hashes": [
                 "sha256:13ec4add8c3faaed8d13e0574f5cd4a323c11655546f91fbe6afa77b57423574",
                 "sha256:233aed0659a2503b831d8a67e9da66a62c996204c0bba4f4c442ccc0c68a3f60",
@@ -1939,6 +1936,7 @@
                 "sha256:f5ab4ba32383061be0fb74bda772d470140a12c1c3b58a0cfbf3dae94d164c28",
                 "sha256:ff43db38af76fda183156153983c9a096fc4c78d0cd1e07b14a2314c7f01c2c8"
             ],
+            "index": "pytorch-cpu",
             "markers": "python_version >= '3.10'",
             "version": "==2.10.0"
         },

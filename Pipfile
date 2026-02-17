@@ -11,9 +11,9 @@ fastapi = {extras = ["standard"], version = "*"}
 bs4 = "*"
 openpyxl = "*"
 xlrd = "*"
+torch = {version = ">=2.5.0", index = "pytorch-cpu"}
 sentence-transformers = "*"
 numpy = "*"
-torch = {version = "*", extras = ["cpu"]}
 
 [dev-packages]
 
