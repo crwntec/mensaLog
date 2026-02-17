@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8e68ee9929a2353a4bf63217ff942068978949369414b6a55c2dd9a386de6880"
+            "sha256": "de31941b6bddfe2855fd569a1b1092e8f09d1f349c0dfe7cc50e2553b236c354"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -393,19 +393,19 @@
                 "standard"
             ],
             "hashes": [
-                "sha256:457134b8f3e08d2d203a18db923a18bbc1a01d9de36fbe1fa7905c4d02a0e5c0",
-                "sha256:57c6e043694c68618eee04d00b4d93213c37f5a854b369d2871a77dfeff57e91"
+                "sha256:210ac280ea41e73aac5a57688781256beb23c2cba3a41266896fa43e6445c8e7",
+                "sha256:7e9634fc212da0b6cfc75bd3ac366cc9dfdb43b5e9ec12e58bfd1acdd2697f25"
             ],
-            "markers": "python_version >= '3.9'",
-            "version": "==0.0.21"
+            "markers": "python_version >= '3.10'",
+            "version": "==0.0.23"
         },
         "fastapi-cloud-cli": {
             "hashes": [
-                "sha256:9c666c2ab1684cee48a5b0a29ac1ae0bd395b9a13bf6858448b4369ea68beda1",
-                "sha256:c897d1d5e27f5b4148ed2601076785155ec8fb385a6a62d3e8801880f929629f"
+                "sha256:4d8f42337e8021c648f6cb0672de7d5b31b0fc7387a83d7b12f974600ac3f2fd",
+                "sha256:874a9ed8dba34ec828f198c72de9f9a38de77ac1b15083d6bc3a4d772b0bc477"
             ],
-            "markers": "python_version >= '3.9'",
-            "version": "==0.12.0"
+            "markers": "python_version >= '3.10'",
+            "version": "==0.13.0"
         },
         "fastar": {
             "hashes": [
@@ -917,6 +917,7 @@
                 "sha256:fcf92bee92742edd401ba41135185866f7026c502617f422eb432cfeca4fe236",
                 "sha256:fd49860271d52127d61197bb50b64f58454e9f578cb4b2c001a6de8b1f50b0b1"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.11'",
             "version": "==2.4.2"
         },
@@ -1207,11 +1208,11 @@
         },
         "pydantic-settings": {
             "hashes": [
-                "sha256:005538ef951e3c2a68e1c08b292b5f2e71490def8589d4221b95dab00dafcfd0",
-                "sha256:fddb9fd99a5b18da837b29710391e945b1e30c135477f484084ee513adb93809"
+                "sha256:95d875514610e8595672800a5c40b073e99e4aae467fa7c8f9c263061ea2e1fe",
+                "sha256:d67b576fff39cd086b595441bf9c75d4193ca9c0ed643b90360694d0f1240246"
             ],
             "markers": "python_version >= '3.10'",
-            "version": "==2.12.0"
+            "version": "==2.13.0"
         },
         "pygments": {
             "hashes": [
@@ -1816,11 +1817,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:931c8f86169fc6f2752cb5c4e6480f0d516112e78750c312e081ababecbaf2ed",
-                "sha256:fa0bec872cfec0302970b2996825723d67390cdd5f0229fb9efed93bd5384899"
+                "sha256:46e1ed8d84355ae54406c924f6b290c3d61f4048625989a723fd622aab838899",
+                "sha256:6520ef2c4acd823f28efc55e43eb6ce2e6d9f954a95a3aa96b6fd14871e92b77"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2.52.0"
+            "version": "==2.53.0"
         },
         "setuptools": {
             "hashes": [
@@ -1901,6 +1902,9 @@
             "version": "==0.22.2"
         },
         "torch": {
+            "extras": [
+                "cpu"
+            ],
             "hashes": [
                 "sha256:13ec4add8c3faaed8d13e0574f5cd4a323c11655546f91fbe6afa77b57423574",
                 "sha256:233aed0659a2503b831d8a67e9da66a62c996204c0bba4f4c442ccc0c68a3f60",
@@ -2015,11 +2019,11 @@
                 "standard"
             ],
             "hashes": [
-                "sha256:839676675e87e73694518b5574fd0f24c9d97b46bea16df7b8c05ea1a51071ea",
-                "sha256:c6c8f55bc8bf13eb6fa9ff87ad62308bbbc33d0b67f84293151efe87e0d5f2ee"
+                "sha256:09d11cf7008da33113824ee5a1c6422d89fbc2ff476540d69a34c87fab8b571a",
+                "sha256:29e35b1d2c36a04b9e180d4007ede3bcb32a85fbdfd6c6aeb3f26839de088187"
             ],
             "markers": "python_version >= '3.10'",
-            "version": "==0.40.0"
+            "version": "==0.41.0"
         },
         "watchfiles": {
             "hashes": [
