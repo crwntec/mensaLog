@@ -61,6 +61,7 @@ async def lifespan(app: FastAPI):
 
         logger.info("Initializing MealIntelligence")
         intel = MealIntelligence()
+        intel.build_embeddings_index()
         logger.info("MealIntelligence initialized")
 
         logger.info("Configuring APScheduler (Europe/Berlin, daily at 07:00)")
@@ -121,7 +122,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="mensa API",
     description="API to retrieve meal plans (Speisenplan)",
-    version="1.0.3",
+    version="1.1.0",
     lifespan=lifespan,
 )
     
