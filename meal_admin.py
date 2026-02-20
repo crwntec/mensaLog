@@ -96,7 +96,7 @@ Examples:
         apply = '--apply' in sys.argv
         intel = MealIntelligence()
         intel.build_embeddings_index()
-        intel.merge_duplicates(threshold=0.792, dry_run=not apply)
+        intel.merge_duplicates(threshold=0.9, dry_run=not apply)
     else:
         print(f"Unknown command: {command}")
         sys.exit(1)

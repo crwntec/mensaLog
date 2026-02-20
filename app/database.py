@@ -3,7 +3,7 @@ import os
 import sqlite3
 from typing import List
 from services.meal_intelligence import MealIntelligence
-from models import MealAPIResponse, MealDict, Mealplan
+from models import MealAPIResponse, MealDict, Mealplan, SearchMealAPIResponseDict
 
 init_db_query = """
 CREATE TABLE IF NOT EXISTS mealplan (
@@ -369,22 +369,26 @@ def fetch_day(datestring):
             print(f"Fetching day failed: {e}")
             return None
 
-def search_meals_db(query_term: str, intel: MealIntelligence) -> List[MealDict]:
+def search_meals_db(query_term: str, intel: MealIntelligence) -> List[SearchMealAPIResponseDict]:
     with connect_db() as conn:
         cursor = conn.cursor()
         
-        # Get semantic matches from embeddings
         results = intel.find_top_similar_meals(query_term, top_k=10)
         
         if results:
             meal_ids = [meal_id for meal_id, score in results]
+            score_map = {meal_id: round(score, 3) for meal_id, score in results}
             placeholders = ','.join('?' * len(meal_ids))
-            cursor.execute(f"SELECT id, name FROM meal WHERE id IN ({placeholders})", meal_ids)
+            cursor.execute(f"SELECT id, name FROM meal WHERE id IN ({placeholders})", tuple(meal_ids))
             rows = cursor.fetchall()
-            # Return in similarity order, not DB order
             id_to_row = {row['id']: row for row in rows}
-            return [MealDict(id=id_to_row[mid]['id'], name=id_to_row[mid]['name']) 
-                    for mid in meal_ids if mid in id_to_row]
+            
+            result_list = [{
+                "id": id_to_row[mid]['id'],
+                "name": id_to_row[mid]['name'],
+                "similarity": score_map[mid]
+            } for mid in meal_ids if mid in id_to_row]
+            return result_list
         
         return []
 

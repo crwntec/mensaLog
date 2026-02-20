@@ -25,10 +25,9 @@ class MealIntelligence:
         os.makedirs(cache_path, exist_ok=True)
 
         print("Loading embedding model...")
-        self.model =  SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        self.model = SentenceTransformer("T-Systems-onsite/cross-en-de-roberta-sentence-transformer")
         print("Model loaded!")
         self.meal_embeddings = {}
-        self.load_cache()
     
     def save_cache(self):
         """Save embeddings to disk"""
@@ -218,8 +217,9 @@ class MealIntelligence:
         
         return None, best_score
     
-    def find_top_similar_meals(self, meal_name: str, top_k: int = 10, threshold: float = 0.7) -> list:
+    def find_top_similar_meals(self, meal_name: str, top_k: int = 10, threshold: float = 0.5) -> list:
         if not self.meal_embeddings:
+            print("[MealIntelligence] No meal embeddings loaded")
             return []
         
         query_embedding = self.encode_meal(meal_name)
@@ -230,4 +230,6 @@ class MealIntelligence:
         ]
         
         scores.sort(key=lambda x: x[1], reverse=True)
+        # print(threshold, scores)
         return [(meal_id, score) for meal_id, score in scores[:top_k] if score >= threshold]
+        # return [(meal_id, score) for meal_id, score in scores[:top_k]]

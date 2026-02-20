@@ -122,7 +122,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="mensa API",
     description="API to retrieve meal plans (Speisenplan)",
-    version="1.1.0",
+    version="1.1.1",
     lifespan=lifespan,
 )
     
@@ -183,7 +183,7 @@ def get_meal(meal_id: int):
 
 @app.get("/search", 
     summary="Search for meals by name",
-    response_model=ApiResponse[List[MealDict]],
+    response_model=ApiResponse[List[SearchMealAPIResponseDict]],
     responses={
         200: {"description": "Meals retrieved successfully"},
         404: {"description": "Meals not found"},

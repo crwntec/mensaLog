@@ -27,13 +27,18 @@ class MealDict(TypedDict):
     id: int
     name: str
 
+class SearchMealAPIResponseDict(TypedDict):
+    id: int
+    name: str
+    similarity: float
+
 class MealAPIResponse(TypedDict):
     id: int
     name: str
     num_servings: int
     dates_served: Dict[str, str] # Serving date -> weekday
     avg_distance: int
-    similar_meals: List[MealDict]
+    similar_meals: List[SearchMealAPIResponseDict]
 
 class DayDict(TypedDict):
     """Day information with weekday and meals"""
