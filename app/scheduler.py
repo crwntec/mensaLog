@@ -84,19 +84,27 @@ def download_and_parse_pdf(intel: MealIntelligence):
                 os.remove(temp_filename)
                 return False
 
-            week1_data = extract_meals(pdf.pages[0])
-            if week1_data:
-                create_mealplan(Mealplan(year=year, week=first_week, days=week1_data.days), intel=intel)
-                logger.info("Stored week %s from %s (%d days)", first_week, week1_filename, len(week1_data.days))
+            # Week 1 — only store if not already in DB
+            if not fetch_mealplan(year, first_week):
+                week1_data = extract_meals(pdf.pages[0])
+                if week1_data:
+                    create_mealplan(Mealplan(year=year, week=first_week, days=week1_data.days), intel=intel)
+                    logger.info("Stored week %s from %s (%d days)", first_week, temp_filename, len(week1_data.days))
+                else:
+                    logger.warning("No meal data extracted for week %s (page 0)", first_week)
             else:
-                logger.warning("No meal data extracted for week %s (page 0)", first_week)
+                logger.info("Week %s already exists in database, skipping", first_week)
 
-            week2_data = extract_meals(pdf.pages[1])
-            if week2_data:
-                create_mealplan(Mealplan(year=year, week=second_week, days=week2_data.days), intel=intel)
-                logger.info("Stored week %s from %s (%d days)", second_week, week2_filename, len(week2_data.days))
+            # Week 2 — only store if not already in DB
+            if not fetch_mealplan(year, second_week):
+                week2_data = extract_meals(pdf.pages[1])
+                if week2_data:
+                    create_mealplan(Mealplan(year=year, week=second_week, days=week2_data.days), intel=intel)
+                    logger.info("Stored week %s from %s (%d days)", second_week, temp_filename, len(week2_data.days))
+                else:
+                    logger.warning("No meal data extracted for week %s (page 1)", second_week)
             else:
-                logger.warning("No meal data extracted for week %s (page 1)", second_week)
+                logger.info("Week %s already exists in database, skipping", second_week)
 
         return True
 
